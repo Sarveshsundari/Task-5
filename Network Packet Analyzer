@@ -1,0 +1,19 @@
+from scapy.all import sniff, IP, TCP, UDP
+
+def process_packet(packet):
+    if IP in packet:
+        ip_layer = packet[IP]
+        protocol = "Other"
+
+        if packet.haslayer(TCP):
+            protocol = "TCP"
+        elif packet.haslayer(UDP):
+            protocol = "UDP"
+
+        print(f"Source: {ip_layer.src} --> Destination: {ip_layer.dst} | Protocol: {protocol}")
+        if packet.haslayer(Raw := getattr(packet, 'load', None)):
+            print(f"Payload: {Raw}\n")
+
+# Capture 10 packets on all interfaces (use iface="Wi-Fi" or "eth0" if needed)
+print("Sniffing packets... Press Ctrl+C to stop.")
+sniff(prn=process_packet, count=10)
